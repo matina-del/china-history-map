@@ -453,7 +453,7 @@ function initMap() {
     }
 
     // 加载中国地图数据
-    fetch('https://geo.datav.aliyun.com/areas_v3/bound/100000_full.json')
+    fetch('https://cdn.jsdelivr.net/gh/apache/echarts@master/test/data/map/json/china.json')
         .then(response => {
             if (!response.ok) {
                 throw new Error('网络响应错误');
