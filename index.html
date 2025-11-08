@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>华夏史迹 - 交互式中国历史地图</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏛️</text></svg>">
+</head>
+<body class="light-theme">
+    <!-- 顶部导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <h1 class="nav-title">华夏史迹</h1>
+            <div class="nav-right">
+                <div class="points-container">
+                    <span class="points-icon">⭐</span>
+                    <span id="points-display" class="points-value">0</span>
+                </div>
+                <div class="search-container">
+                    <input type="text" id="search-input" class="search-input" placeholder="搜索城市或历史事件...">
+                    <button id="search-btn" class="search-btn">🔍</button>
+                    <div id="search-suggestions" class="search-suggestions"></div>
+                </div>
+                <button id="quiz-btn" class="quiz-btn" title="每日问答">❓</button>
+                <button id="favorites-btn" class="favorites-btn">我的收藏</button>
+                <button id="gamification-btn" class="gamification-btn" title="成就与排行榜">🏆</button>
+                <button id="theme-toggle" class="theme-toggle" title="切换深色模式">🌙</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主体区域 -->
+    <main class="main-container">
+        <!-- 左侧：地图容器 -->
+        <div id="map-container" class="map-container"></div>
+        
+        <!-- 右侧：信息面板 -->
+        <div id="info-panel" class="info-panel">
+            <div class="info-default">
+                <h2>欢迎来到华夏史迹</h2>
+                <p>点击地图上的省份，探索该地的历史故事</p>
+                <p>您可以了解重大历史事件、标志性建筑、历史人物</p>
+                <div class="decoration">🏛️</div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 底部：时间轴 -->
+    <div id="timeline" class="timeline">
+        <select id="timeline-select" class="timeline-select">
+            <option value="">选择历史时期</option>
+            <option value="夏商周">夏商周 (约前2070-前256)</option>
+            <option value="秦汉">秦汉 (前221-220)</option>
+            <option value="魏晋南北朝">魏晋南北朝 (220-589)</option>
+            <option value="隋唐">隋唐 (581-907)</option>
+            <option value="宋元">宋元 (960-1368)</option>
+            <option value="明清">明清 (1368-1912)</option>
+            <option value="近代">近代 (1840-1949)</option>
+            <option value="现代">现代 (1949至今)</option>
+        </select>
+        <button class="timeline-btn" data-period="夏商周">夏商周<br><span>(约前2070-前256)</span></button>
+        <button class="timeline-btn" data-period="秦汉">秦汉<br><span>(前221-220)</span></button>
+        <button class="timeline-btn" data-period="魏晋南北朝">魏晋南北朝<br><span>(220-589)</span></button>
+        <button class="timeline-btn" data-period="隋唐">隋唐<br><span>(581-907)</span></button>
+        <button class="timeline-btn" data-period="宋元">宋元<br><span>(960-1368)</span></button>
+        <button class="timeline-btn" data-period="明清">明清<br><span>(1368-1912)</span></button>
+        <button class="timeline-btn" data-period="近代">近代<br><span>(1840-1949)</span></button>
+        <button class="timeline-btn" data-period="现代">现代<br><span>(1949至今)</span></button>
+    </div>
+
+    <!-- 收藏弹窗 -->
+    <div id="favorites-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>我的收藏</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div id="favorites-list" class="favorites-list"></div>
+        </div>
+    </div>
+
+    <!-- 图片放大弹窗 -->
+    <div id="image-modal" class="modal">
+        <div class="modal-content image-modal-content">
+            <button class="modal-close">&times;</button>
+            <img id="modal-image" src="" alt="">
+        </div>
+    </div>
+
+    <!-- 每日问答弹窗 -->
+    <div id="quiz-modal" class="modal">
+        <div class="modal-content quiz-modal-content">
+            <div class="modal-header">
+                <h2>📚 每日历史问答</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div id="quiz-stats" class="quiz-stats"></div>
+            <div id="quiz-question" class="quiz-question"></div>
+            <div id="quiz-options" class="quiz-options"></div>
+            <div id="quiz-result" class="quiz-result" style="display: none;"></div>
+            <div id="quiz-explanation" class="quiz-explanation" style="display: none;"></div>
+        </div>
+    </div>
+
+    <!-- 游戏化系统弹窗 -->
+    <div id="gamification-modal" class="modal">
+        <div class="modal-content gamification-modal-content">
+            <div class="modal-header">
+                <h2>🏆 成就与排行榜</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="gamification-tabs">
+                <button class="gamification-tab active" data-tab="achievements">成就</button>
+                <button class="gamification-tab" data-tab="leaderboard">排行榜</button>
+                <button class="gamification-tab" data-tab="progress">学习进度</button>
+            </div>
+            <div class="gamification-content">
+                <div id="achievements-tab" class="tab-content active">
+                    <div id="achievements-list" class="achievements-list"></div>
+                </div>
+                <div id="leaderboard-tab" class="tab-content">
+                    <div class="leaderboard-header">
+                        <button class="leaderboard-filter active" data-period="all">总榜</button>
+                        <button class="leaderboard-filter" data-period="week">周榜</button>
+                        <button class="leaderboard-filter" data-period="month">月榜</button>
+                    </div>
+                    <div id="leaderboard-list" class="leaderboard-list"></div>
+                </div>
+                <div id="progress-tab" class="tab-content">
+                    <div class="progress-stats">
+                        <div class="progress-item">
+                            <div class="progress-label">学习进度</div>
+                            <div class="progress-bar-container">
+                                <div id="learning-progress-bar" class="progress-bar"></div>
+                                <span id="learning-progress-text" class="progress-text">0%</span>
+                            </div>
+                        </div>
+                        <div class="progress-item">
+                            <div class="progress-label">已访问省份</div>
+                            <div class="progress-value" id="visited-provinces">0/34</div>
+                        </div>
+                        <div class="progress-item">
+                            <div class="progress-label">已学习事件</div>
+                            <div class="progress-value" id="learned-events">0</div>
+                        </div>
+                        <div class="progress-item">
+                            <div class="progress-label">总积分</div>
+                            <div class="progress-value" id="total-points">0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 引入ECharts -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+    <!-- 引入项目JS文件 -->
+    <script src="./js/gamification.js"></script>
+    <script src="./js/quiz.js"></script>
+    <script src="./js/main.js"></script>
+    <script src="./js/map.js"></script>
+</body>
+</html>
+
