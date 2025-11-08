@@ -85,7 +85,7 @@ function loadHistoryData() {
     }
     
     // 从服务器加载数据
-    fetch('./data/history-data.json')
+    fetch('history-data.json')
         .then(response => response.json())
         .then(data => {
             historyData = data;
